@@ -1,7 +1,6 @@
 package com.tool.pdfGenerator.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tool.pdfGenerator.model.Invoice;
 import com.tool.pdfGenerator.model.Item;

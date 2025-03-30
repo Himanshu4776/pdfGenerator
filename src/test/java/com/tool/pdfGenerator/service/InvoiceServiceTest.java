@@ -14,11 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -45,8 +42,6 @@ public class InvoiceServiceTest {
     void setup() throws NoSuchFieldException, IllegalAccessException {
         // Set the PDF storage path to our temp directory for testing
         invoiceService.setPdfStoragePath(tempDir.toString() + "/");
-
-//        ReflectionTestUtils.setField(InvoiceService.class, "PDF_STORAGE_PATH", tempDir.toString() + "/");
 
         Item item = new Item("Product 1", "12 Nos", 123.00, 1476.00);
         testInvoice = new Invoice(
