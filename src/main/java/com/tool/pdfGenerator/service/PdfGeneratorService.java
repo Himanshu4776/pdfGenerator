@@ -17,6 +17,16 @@ import java.io.IOException;
 public class PdfGeneratorService {
 
     public void generateInvoicePdf(Invoice invoice, String filePath) throws DocumentException, IOException {
+        if (invoice == null) {
+            log.error("Invoice data is null, cannot generate PDF");
+            throw new IllegalArgumentException("Invoice data is null");
+        }
+
+        if (filePath == null || filePath.isEmpty()) {
+            log.error("PDF file path is null or empty, cannot generate PDF");
+            throw new IllegalArgumentException("PDF file path is null or empty");
+        }
+
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, new FileOutputStream(filePath));
         document.open();
