@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -40,9 +42,11 @@ public class InvoiceServiceTest {
     private Invoice testInvoice;
 
     @BeforeEach
-    void setup() {
+    void setup() throws NoSuchFieldException, IllegalAccessException {
         // Set the PDF storage path to our temp directory for testing
-        ReflectionTestUtils.setField(invoiceService, "PDF_STORAGE_PATH", tempDir.toString() + "/");
+        invoiceService.setPdfStoragePath(tempDir.toString() + "/");
+
+//        ReflectionTestUtils.setField(InvoiceService.class, "PDF_STORAGE_PATH", tempDir.toString() + "/");
 
         Item item = new Item("Product 1", "12 Nos", 123.00, 1476.00);
         testInvoice = new Invoice(
@@ -72,8 +76,8 @@ public class InvoiceServiceTest {
 
             byte[] result = invoiceService.generateInvoice(testInvoice);
 
-            verify(pdfGeneratorService).generateInvoicePdf(eq(testInvoice), anyString());
             assertArrayEquals(testContent, result);
+            verify(pdfGeneratorService).generateInvoicePdf(eq(testInvoice), anyString());
         }
     }
 

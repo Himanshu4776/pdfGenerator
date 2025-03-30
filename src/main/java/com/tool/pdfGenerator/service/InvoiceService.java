@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,11 +17,19 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 @Slf4j
 public class InvoiceService {
-
     private final PdfGeneratorService pdfGeneratorService;
-    private static final String PDF_STORAGE_PATH = "pdf-storage/";
+    private static String PDF_STORAGE_PATH;
+
+    public static void setPdfStoragePath(String path) {
+        if (path == null || path.isEmpty()) {
+            PDF_STORAGE_PATH = "pdf-storage/";
+        } else {
+            PDF_STORAGE_PATH = path;
+        }
+    }
 
     public byte[] generateInvoice(Invoice invoice) throws IOException, DocumentException {
+        setPdfStoragePath(null);
         String invoiceHash = HashUtil.generateHash(invoice);
         String pdfFilePath = PDF_STORAGE_PATH + invoiceHash + ".pdf";
         File pdfFile = new File(pdfFilePath);
@@ -40,6 +47,7 @@ public class InvoiceService {
     }
 
     public byte[] getInvoicePdf(String hash) throws IOException {
+        setPdfStoragePath(null);
         String pdfFilePath = PDF_STORAGE_PATH + hash + ".pdf";
         Path path = Paths.get(pdfFilePath);
 
@@ -51,6 +59,7 @@ public class InvoiceService {
     }
 
     public boolean invoicePdfExists(String hash) {
+        setPdfStoragePath(null);
         String pdfFilePath = PDF_STORAGE_PATH + hash + ".pdf";
         return new File(pdfFilePath).exists();
     }

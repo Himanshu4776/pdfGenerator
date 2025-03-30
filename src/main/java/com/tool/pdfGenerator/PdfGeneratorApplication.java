@@ -3,10 +3,6 @@ package com.tool.pdfGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 
 import java.io.File;
 
@@ -23,13 +19,23 @@ public class PdfGeneratorApplication {
 		}
 	}
 
-	@Bean
-	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.invoice.controller"))
-				.paths(PathSelectors.any())
-				.build();
-	}
+//	@Bean
+//	public Docket api() {
+//		return new Docket(DocumentationType.SWAGGER_2)
+//				.select()
+//				.apis(RequestHandlerSelectors.basePackage("com.invoice.controller"))
+//				.paths(PathSelectors.any())
+//				.build()
+//				.apiInfo(apiInfo());
+//	}
+//
+//	private ApiInfo apiInfo() {
+//		return new ApiInfoBuilder()
+//				.title("Pdf Generator API")
+//				.description("API for generating PDFs")
+//				.version("1.0")
+//				.contact(new Contact("Your Name", "https://your-website.com", "your-email@example.com"))
+//				.build();
+//	}
 
 }

@@ -4,8 +4,6 @@ import com.tool.pdfGenerator.model.Invoice;
 import com.tool.pdfGenerator.service.InvoiceService;
 import com.tool.pdfGenerator.util.HashUtil;
 import com.itextpdf.text.DocumentException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -21,13 +19,11 @@ import java.io.IOException;
 @RequestMapping("/api/invoices")
 @RequiredArgsConstructor
 @Slf4j
-@Api(tags = "Invoice API")
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
     @PostMapping("/generate")
-    @ApiOperation("Generate a PDF invoice from provided data")
     public ResponseEntity<byte[]> generateInvoice(@Valid @RequestBody Invoice invoice) {
         try {
             byte[] pdfBytes = invoiceService.generateInvoice(invoice);
@@ -46,7 +42,6 @@ public class InvoiceController {
     }
 
     @GetMapping("/download/{hash}")
-    @ApiOperation("Download a previously generated PDF by its hash")
     public ResponseEntity<byte[]> downloadInvoice(@PathVariable String hash) {
         try {
             if (!invoiceService.invoicePdfExists(hash)) {

@@ -6,31 +6,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tool.pdfGenerator.model.Invoice;
 import com.tool.pdfGenerator.model.Item;
 import com.tool.pdfGenerator.service.InvoiceService;
-import com.tool.pdfGenerator.util.HashUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(InvoiceController.class)
+@ExtendWith(MockitoExtension.class)
 public class InvoiceControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Mock
     private InvoiceService invoiceService;
+
+    @InjectMocks
+    private InvoiceController invoiceController;
 
     private Invoice testInvoice;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -56,12 +54,11 @@ public class InvoiceControllerTest {
 
         when(invoiceService.generateInvoice(any(Invoice.class))).thenReturn(samplePdf);
 
-        mockMvc.perform(post("/api/invoices/generate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testInvoice)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
-                .andExpect(header().exists("Invoice-Hash"));
+        ResponseEntity<byte[]> result = invoiceController.generateInvoice(testInvoice);
+        assertNotNull(result);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(true, result.getHeaders().containsKey("Invoice-Hash"));
+        assertEquals(result.getHeaders().getContentType(), MediaType.APPLICATION_PDF);
     }
 
     @Test
@@ -72,18 +69,18 @@ public class InvoiceControllerTest {
         when(invoiceService.invoicePdfExists(hash)).thenReturn(true);
         when(invoiceService.getInvoicePdf(hash)).thenReturn(samplePdf);
 
-        mockMvc.perform(get("/api/invoices/download/{hash}", hash))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_PDF));
+        ResponseEntity<byte[]> result = invoiceController.downloadInvoice(hash);
+        assertNotNull(result);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(result.getHeaders().getContentType(), MediaType.APPLICATION_PDF);
     }
 
     @Test
     void downloadInvoice_NonExistingHash_ShouldReturnNotFound() throws Exception {
         String hash = "nonexistinghash";
-
         when(invoiceService.invoicePdfExists(hash)).thenReturn(false);
 
-        mockMvc.perform(get("/api/invoices/download/{hash}", hash))
-                .andExpect(status().isNotFound());
+        ResponseEntity<byte[]> result = invoiceController.downloadInvoice(hash);
+        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }
 }
